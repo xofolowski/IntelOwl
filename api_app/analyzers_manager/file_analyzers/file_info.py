@@ -2,7 +2,7 @@
 # See the file 'LICENSE' for copying permission.
 
 import logging
-from pathlib import PosixPath
+from pathlib import Path, PosixPath
 from typing import Optional
 
 import magic
@@ -11,6 +11,7 @@ import tlsh
 from django.conf import settings
 from django.utils.functional import cached_property
 from exiftool import ExifTool
+from magika import Magika
 
 from api_app.analyzers_manager.classes import FileAnalyzer
 from api_app.helpers import calculate_md5, calculate_sha1, calculate_sha256
@@ -35,6 +36,14 @@ class FileInfo(FileAnalyzer):
         results = {}
         results["magic"] = magic.from_file(self.filepath)
         results["mimetype"] = magic.from_file(self.filepath, mime=True)
+        path = Path(self.filepath)
+        m = Magika()
+        res = m.identify_path(path)
+        results["magika"] = {
+            "mime_type": res.output.mime_type,
+            "description": res.output.description,
+            "label": res.output.ct_label,
+        }
 
         binary = self.read_file_bytes()
         results["md5"] = calculate_md5(binary)

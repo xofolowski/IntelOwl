@@ -39,7 +39,7 @@ class MimeTypes(models.TextChoices):
     JAVASCRIPT1 = "application/javascript"
     JAVASCRIPT2 = "application/x-javascript"
     JAVASCRIPT3 = "text/javascript"
-    VB_SCRIPT = "application/x-vbscript"
+    VB_SCRIPT = "text/x-vbscript"
     IQY = "text/x-ms-iqy"
     APK = "application/vnd.android.package-archive"
     DEX = "application/x-dex"
@@ -87,14 +87,8 @@ class MimeTypes(models.TextChoices):
 
     @classmethod
     def _calculate_from_filename(cls, file_name: str) -> Optional["MimeTypes"]:
-        if file_name.endswith(".js") or file_name.endswith(".jse"):
-            mimetype = cls.JAVASCRIPT1
-        elif file_name.endswith(".vbs") or file_name.endswith(".vbe"):
-            mimetype = cls.VB_SCRIPT
-        elif file_name.endswith(".iqy"):
+        if file_name.endswith(".iqy"):
             mimetype = cls.IQY
-        elif file_name.endswith(".apk"):
-            mimetype = cls.APK
         elif file_name.endswith(".dex"):
             mimetype = cls.DEX
         elif file_name.endswith(".one"):
@@ -106,6 +100,7 @@ class MimeTypes(models.TextChoices):
     @classmethod
     def calculate(cls, file_pointer, file_name) -> str:
         from magic import from_buffer as magic_from_buffer
+        from magika import Magika
 
         mimetype = None
         if file_name:
@@ -113,8 +108,19 @@ class MimeTypes(models.TextChoices):
 
         if mimetype is None:
             buffer = file_pointer.read()
-            mimetype = magic_from_buffer(buffer, mime=True)
-            logger.debug(f"mimetype is {mimetype}")
+            m = Magika()
+            res = m.identify_bytes(buffer)
+            mimetype = res.output.mime_type
+            # this means that Magika did not identify the file
+            if not mimetype or mimetype == "application/octet-stream":
+                logger.info(
+                    "magika did not identify the file. Trying with python-magic. "
+                    f"filename: {file_name}"
+                )
+                mimetype = magic_from_buffer(buffer, mime=True)
+            if mimetype == "application/x-dosexec":
+                mimetype = "application/vnd.microsoft.portable-executable"
+            logger.info(f"mimetype for file {file_name} is {mimetype}")
             try:
                 mimetype = cls(mimetype)
             except ValueError:

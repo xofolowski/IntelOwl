@@ -37,7 +37,7 @@ export const FileMimeTypes = Object.freeze({
   JAVASCRIPT1: "application/javascript",
   JAVASCRIPT2: "application/x-javascript",
   JAVASCRIPT3: "text/javascript",
-  VB_SCRIPT: "application/x-vbscript",
+  VB_SCRIPT: "text/x-vbscript",
   IQY: "text/x-ms-iqy",
   APK: "application/vnd.android.package-archive",
   DEX: "application/x-dex",
