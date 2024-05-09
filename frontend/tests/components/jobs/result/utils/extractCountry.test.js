@@ -81,7 +81,7 @@ describe("extractCountry test", () => {
           status: "SUCCESS",
           end_time: "2024-01-15T14:56:32.328332Z",
           report: {
-            data: {
+            country: {
               names: {
                 de: "Schweden",
                 en: "Sweden",

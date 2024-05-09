@@ -11,7 +11,10 @@ export function extractCountry(job) {
     if (report.name === "Ip2location") ip2LocationReport = report;
   });
   if (maxmindAnalyzerReport) {
-    countryName = maxmindAnalyzerReport.report?.data?.names?.en || countryName;
+    countryName =
+      maxmindAnalyzerReport.report?.country?.names?.en || countryName;
+    countryCode =
+      maxmindAnalyzerReport.report?.country?.iso_code || countryCode;
   }
   if (ip2LocationReport) {
     // update with Ip2location data, don't override previous extracted data
