@@ -1098,13 +1098,21 @@ class PythonConfig(AbstractConfig):
         ]
         ordering = ["name", "disabled"]
 
-    def get_routing_key(self) -> str:
+    def get_routing_key(self, user:User=None) -> str:
         if self.routing_key not in settings.CELERY_QUEUES:
-            logger.warning(
+            logger.error(
                 f"{self.name}: you have no worker for {self.routing_key}."
                 f" Using {settings.DEFAULT_QUEUE} queue."
             )
             return settings.DEFAULT_QUEUE
+        if user and not user.profile.is_robot:
+            key = self.routing_key + "_manual"
+            if key in settings.CELERY_QUEUES:
+                return key
+            logger.error(
+                f"{self.name}: you have no worker for {key}."
+                f" Using {self.routing_key} queue."
+            )
         return self.routing_key
 
     @property
@@ -1208,7 +1216,10 @@ class PythonConfig(AbstractConfig):
 
     @property
     def queue(self):
-        return get_queue_name(self.get_routing_key())
+        return self.get_queue_for_user(user=None)
+
+    def get_queue_for_user(self, user: User=None):
+        return get_queue_name(self.get_routing_key(user))
 
     @property
     def options(self) -> QuerySet:
