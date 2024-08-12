@@ -1098,7 +1098,7 @@ class PythonConfig(AbstractConfig):
         ]
         ordering = ["name", "disabled"]
 
-    def get_routing_key(self, user:User=None) -> str:
+    def get_routing_key(self, user: User = None) -> str:
         if self.routing_key not in settings.CELERY_QUEUES:
             logger.error(
                 f"{self.name}: you have no worker for {self.routing_key}."
@@ -1218,7 +1218,7 @@ class PythonConfig(AbstractConfig):
     def queue(self):
         return self.get_queue_for_user(user=None)
 
-    def get_queue_for_user(self, user: User=None):
+    def get_queue_for_user(self, user: User = None):
         return get_queue_name(self.get_routing_key(user))
 
     @property
