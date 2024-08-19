@@ -7,7 +7,7 @@ x-no-healthcheck: &no-healthcheck
 services:
   uwsgi:
     environment:
-      - CELERY_QUEUES=default,local,long
+      - CELERY_QUEUES=default,default_manual,local,local_manual,long,long_manual,ingestor,config
 
   celery_worker_local:
     image: intelowlproject/intelowl:${REACT_APP_INTELOWL_VERSION}
