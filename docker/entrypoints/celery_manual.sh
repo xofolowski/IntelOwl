@@ -2,7 +2,7 @@
 
 until cd /opt/deploy/intel_owl
 do
-    echo "Waiting for server volume...
+    echo "Waiting for server volume..."
 done
 
 # Apply database migrations
@@ -26,7 +26,7 @@ fi
 
 echo "worker number: $worker_number"
 
-ARGUMENTS="-A intel_owl.celery worker -n worker_local --uid www-data --time-limit=10000 --gid www-data --pidfile= -c $worker_number -Ofair -Q local_manual.fifo,long_manual.fifo -E --without-gossip"
+ARGUMENTS="-A intel_owl.celery worker -n worker_local --uid www-data --time-limit=10000 --gid www-data --pidfile= -c $worker_number -Ofair -Q local_manual.fifo,long_manual.fifo,default_manual.fifo -E --without-gossip"
 if [[ $DEBUG == "True" ]] && [[ $DJANGO_TEST_SERVER == "True" ]];
 then
     echo "Running celery with autoreload"
